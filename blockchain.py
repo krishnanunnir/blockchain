@@ -23,6 +23,8 @@ class Blockchain:
         self.current_transactions=[]
         self.chain.append(block)
         return block
+
+
     def new_transactions(self,sender,reciever,amount):
         transaction = {
             'sender':sender,
@@ -35,16 +37,21 @@ class Blockchain:
     @property
     def last_block(self):
         return self.chain[-1]
+
+
     @staticmethod
     def hash(block):
-        block_string = json.dump(block,sort_keys=True).encode()
+        block_string = json.dumps(block,sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
+
 
     def proof_of_work(self,last_proof):
         proof=0
         if(not self.valid_proof(proof,last_proof)):
             proof+=1;
         return proof
+
+
     @staticmethod
     def valid_proof(proof,last_proof):
         guess_hash=f'{proof}{last_proof}'.encode()
@@ -75,11 +82,11 @@ def mine():
     proof = blockchain.proof_of_work(last_proof)
     previous_hash=blockchain.hash(last_blockchain)
     block = blockchain.new_block(proof,previous_hash)
-    blockchain.new_transactions(sender="0",receiver=node_identifier,amount=1)
+    blockchain.new_transactions(sender="0",reciever=node_identifier,amount=1)
     response = {
         'index':block['index'],
         'time':time(),
-        'transactions':block['current_transactions'],
+        'transactions':block['transactions'],
         'previous_hash':block['previous_hash'],
         'proof':proof,
     }
