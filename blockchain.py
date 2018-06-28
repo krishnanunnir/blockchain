@@ -34,7 +34,7 @@ class Blockchain:
             'amount': amount
         }
         self.current_transactions.append(transaction)
-        return transaction
+        return self.last_block['index']+1
 
     @property
     def last_block(self):
@@ -69,9 +69,7 @@ blockchain = Blockchain()
 def transaction():
     unit = request.get_json()
     req_values=['sender','reciever','data']
-    if not all(i in unit for i in req_values):
-        return "Missing Values",400
-    index=blockchain.new_transaction(unit['sender'],unit['reciever'],unit['amount'])
+    index=blockchain.new_transactions(unit['sender'],unit['reciever'],unit['amount'])
     response={'message':f'Transaction will be added to the block {index}'}
     return jsonify(response),200
 
@@ -83,10 +81,11 @@ def mine():
     print('This error output', file=sys.stderr)
     last_blockchain = blockchain.last_block
     last_proof = last_blockchain['proof']
+    blockchain.new_transactions(sender="0",reciever=node_identifier,amount=1)
     proof = blockchain.proof_of_work(last_proof)
     previous_hash=blockchain.hash(last_blockchain)
     block = blockchain.new_block(proof,previous_hash)
-    blockchain.new_transactions(sender="0",reciever=node_identifier,amount=1)
+
     response = {
         'index':block['index'],
         'time':time(),
