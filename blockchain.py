@@ -3,6 +3,8 @@ from time import time
 import hashlib
 from uuid import uuid4
 from flask import Flask, jsonify, request
+
+
 app=Flask(__name__)
 class Blockchain:
     def __init__(self):
@@ -36,7 +38,7 @@ class Blockchain:
     @staticmethod
     def hash(block):
         block_string = json.dump(block,sort_keys=True).encode()
-        return hashlib.sha256(block_string).hex_digest()
+        return hashlib.sha256(block_string).hexdigest()
 
     def proof_of_work(self,last_proof):
         proof=0
@@ -45,11 +47,14 @@ class Blockchain:
         return proof
     @staticmethod
     def valid_proof(proof,last_proof):
-        guess_hash=f'{proof}{last_proof}'
-        return hashlib.sha256(guess_hash).hex_digest()[:4]=='0000'
+        guess_hash=f'{proof}{last_proof}'.encode()
+        return hashlib.sha256(guess_hash).hexdigest()#[:4]=='0000'
 
 node_identifier = str(uuid4()).replace('-', '')
 blockchain = Blockchain()
+
+
+
 @app.route('/transaction/new',methods=['POST'])
 def transaction():
     unit = request.get_json()
@@ -59,6 +64,9 @@ def transaction():
     index=blockchain.new_transaction(unit['sender'],unit['reciever'],unit['amount'])
     response={'message':f'Transaction will be added to the block {index}'}
     return jsonify(response),200
+
+
+
 
 @app.route('/mine/',methods=['GET'])
 def mine():
