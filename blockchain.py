@@ -3,6 +3,8 @@ from time import time
 import hashlib
 from uuid import uuid4
 from flask import Flask, jsonify, request
+import sys
+
 
 
 app=Flask(__name__)
@@ -47,7 +49,8 @@ class Blockchain:
 
     def proof_of_work(self,last_proof):
         proof=0
-        if(not self.valid_proof(proof,last_proof)):
+        print("proof of work function called",file=sys.stderr)
+        while(not self.valid_proof(proof,last_proof)):
             proof+=1;
         return proof
 
@@ -55,7 +58,7 @@ class Blockchain:
     @staticmethod
     def valid_proof(proof,last_proof):
         guess_hash=f'{proof}{last_proof}'.encode()
-        return hashlib.sha256(guess_hash).hexdigest()#[:4]=='0000'
+        return hashlib.sha256(guess_hash).hexdigest()[:4]=='0000'
 
 node_identifier = str(uuid4()).replace('-', '')
 blockchain = Blockchain()
@@ -77,6 +80,7 @@ def transaction():
 
 @app.route('/mine/',methods=['GET'])
 def mine():
+    print('This error output', file=sys.stderr)
     last_blockchain = blockchain.last_block
     last_proof = last_blockchain['proof']
     proof = blockchain.proof_of_work(last_proof)
